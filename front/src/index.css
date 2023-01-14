@@ -1,0 +1,132 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  background-color: #f2f3f5;
+}
+
+input {
+  all: unset;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: transparent;
+  border: 1px solid lightgray;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+button {
+  all: unset;
+  cursor: pointer;
+  padding: 5px 20px;
+  border-radius: 5px;
+  border: 0;
+  background: dodgerblue;
+  color: white;
+  font-weight: 500;
+}
+
+.inputs {
+  width: min(50rem, 90%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-inline: 2rem;
+}
+
+.container .title {
+  margin-top: 2rem;
+}
+
+.container .logs {
+  width: min(50rem, 90%);
+  height: 100%;
+  margin-top: 2rem;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.container .logs .log {
+  width: 100%;
+  border-radius: 8px;
+  background-color: white;
+  padding: 1rem;
+
+  margin-bottom: 1rem;
+}
+
+.log > .header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.header .description {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.header .description span {
+  color: green;
+  padding-right: 2rem;
+}
+
+.header .state {
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.log .date {
+  margin-top: 1rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.state[data-state="processing"] {
+  background-color: gray;
+  color: black;
+}
+
+.state[data-state="success"] {
+  background-color: green;
+  color: white;
+}
+
+.state[data-state="fail"] {
+  background-color: red;
+  color: white;
+}
+
+.state[data-state="retrying"] {
+  background-color: yellow;
+  color: black;
+}
+
+.info {
+  color: gray;
+  margin-top: 1rem;
+}
