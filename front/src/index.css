@@ -130,3 +130,31 @@ button {
   color: gray;
   margin-top: 1rem;
 }
+
+@keyframes anim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.disclaimer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: red;
+  padding: 5px;
+  color: white;
+  text-align: center;
+  opacity: 0;
+
+  animation-name: anim;
+  animation-duration: 5s;
+  animation-delay: 3s;
+  animation-direction: alternate-reverse;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+}

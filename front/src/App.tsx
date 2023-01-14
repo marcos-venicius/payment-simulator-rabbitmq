@@ -49,7 +49,7 @@ function App() {
 
       setLogs(newLogsList);
 
-      timer = setTimeout(load, 1000);
+      timer = setTimeout(load, 1500);
     }
 
     load();
@@ -61,6 +61,7 @@ function App() {
 
   return (
     <main className="container">
+      <span className="disclaimer">please, don't judge my web app. is not for production, only to test the backend in a visual way. - por favor, não julge esta aplicação. ela é apenas para testar o backend visualmente</span>
       <h1 className="title">Logs de pagamentos</h1>
       <div className="inputs">
         <input
