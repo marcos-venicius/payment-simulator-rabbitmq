@@ -37,7 +37,7 @@ public sealed class RabbitMqPaymentConsumerService : IMessageConsumerService<Pay
         
         _channel.BasicQos(
             prefetchSize: 0,
-            prefetchCount: 1,
+            prefetchCount: 3,
             global: false
         );
     }
