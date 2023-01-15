@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using PaymentService.Infra.Context;
+using PaymentService.Models;
 using PaymentService.RabbitMq.Models;
 using PaymentService.Repositories.Interfaces;
 
@@ -14,16 +15,16 @@ public sealed class PaymentRepository : IPaymentRepository
         _context = context;
     }
 
-    public async Task<bool> ExistsAsync(Guid id)
+    public async Task<Payment?> FindByIdAsync(Guid id)
     {
         using var connection = _context.CreateConnection();
 
-        var item = await connection.QueryFirstOrDefaultAsync<object>("SELECT TOP(1) * FROM Payment WHERE Id = @Id", new
+        var item = await connection.QueryFirstOrDefaultAsync<Payment>("SELECT TOP(1) * FROM Payment WHERE Id = @Id", new
         {
             Id = id
         });
 
-        return item is not null;
+        return item;
     }
 
     public async Task SaveAsync(PaymentData data)

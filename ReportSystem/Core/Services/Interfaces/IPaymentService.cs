@@ -5,6 +5,6 @@ namespace Core.Services.Interfaces;
 
 public interface IPaymentService
 {
-    void CreatePayment(CreatePaymentRequest request);
+    Task CreatePayment(CreatePaymentRequest request);
     Task<List<Payment>> ListAsync();
 }

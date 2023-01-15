@@ -17,9 +17,11 @@ public sealed class PaymentService : IPaymentService
         _paymentRepository = paymentRepository;
     }
 
-    public void CreatePayment(CreatePaymentRequest request)
+    public async Task CreatePayment(CreatePaymentRequest request)
     {
         var paymentData = new PaymentData(Guid.NewGuid(), request.Name, request.Price);
+
+        await _paymentRepository.SaveAsync(paymentData);
         
         _paymentMessageProducerService.Publish(paymentData);
     }

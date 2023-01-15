@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Commons.Exceptions;
 using Newtonsoft.Json;
 using PaymentService.Delegates;
 using PaymentService.RabbitMq.Models;
@@ -21,7 +22,7 @@ public sealed class RabbitMqPaymentConsumerService : IMessageConsumerService<Pay
         {
             UserName = "user",
             Password = "password",
-            HostName = "localhost"
+            HostName = "localhost",
         };
 
         _connection = factory.CreateConnection();
@@ -34,16 +35,16 @@ public sealed class RabbitMqPaymentConsumerService : IMessageConsumerService<Pay
             exclusive: false,
             arguments: null
         );
-        
+
         _channel.BasicQos(
             prefetchSize: 0,
             prefetchCount: 3,
             global: false
         );
     }
-    
+
     public event ConsumerEvent<PaymentData>? OnReceived;
-    
+
     public void Listen()
     {
         var consumer = new EventingBasicConsumer(_channel);
@@ -53,18 +54,25 @@ public sealed class RabbitMqPaymentConsumerService : IMessageConsumerService<Pay
             try
             {
                 var serialized = Encoding.UTF8.GetString(ea.Body.ToArray());
-            
+
                 var deserializeObject = JsonConvert.DeserializeObject<PaymentData>(serialized);
 
                 if (deserializeObject is null)
                     throw new ApplicationException("CANNOT_DESERIALIZED_OBJECT");
-                    
+
                 if (OnReceived is not null)
                     await OnReceived.Invoke(deserializeObject);
-                
+
                 _channel.BasicAck(
                     deliveryTag: ea.DeliveryTag,
                     multiple: false
+                );
+            }
+            catch (RejectException)
+            {
+                _channel.BasicReject(
+                    deliveryTag: ea.DeliveryTag,
+                    requeue: false
                 );
             }
             catch
@@ -83,7 +91,7 @@ public sealed class RabbitMqPaymentConsumerService : IMessageConsumerService<Pay
             consumer: consumer
         );
     }
-    
+
     public void Dispose()
     {
         _channel.Dispose();

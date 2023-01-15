@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService", "PaymentService\PaymentService.csproj", "{126EA399-DE37-43DA-8B32-CA3C5E0D1890}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons", "Commons\Commons.csproj", "{B2FE0028-17ED-4C99-B782-39CC65740681}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{126EA399-DE37-43DA-8B32-CA3C5E0D1890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{126EA399-DE37-43DA-8B32-CA3C5E0D1890}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{126EA399-DE37-43DA-8B32-CA3C5E0D1890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2FE0028-17ED-4C99-B782-39CC65740681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2FE0028-17ED-4C99-B782-39CC65740681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2FE0028-17ED-4C99-B782-39CC65740681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2FE0028-17ED-4C99-B782-39CC65740681}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

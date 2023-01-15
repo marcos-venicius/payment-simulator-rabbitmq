@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "./services/api";
 
-type LogState = "processing" | "success" | "fail" | "retrying";
+type LogState = "processing" | "success" | "fail" | "retrying" | "waiting";
 
 interface ILog {
   id: string;
