@@ -11,9 +11,11 @@ public sealed class RabbitMqPaymentProducerService : IMessageProducerService<Pay
     private readonly IConnection _connection;
     private readonly IModel _channel;
 
-    private const string ExchangeName = "payments-exchange";
-    private const string QueueName = "payments-queue";
-    private const string RouteName = "make-payment";
+    private const string QueueName = "payments";
+    private const string ExchangeName = "payments";
+    
+    private const string QueueRetryName = "payments-retry";
+    private const string ExchangeRetryName = "payments-retry";
 
     public RabbitMqPaymentProducerService()
     {
@@ -29,7 +31,15 @@ public sealed class RabbitMqPaymentProducerService : IMessageProducerService<Pay
 
         _channel.ExchangeDeclare(
             exchange: ExchangeName,
-            type: ExchangeType.Direct,
+            type: ExchangeType.Fanout,
+            durable: true,
+            autoDelete: false,
+            arguments: null
+        );
+
+        _channel.ExchangeDeclare(
+            exchange: ExchangeRetryName,
+            type: ExchangeType.Fanout,
             durable: true,
             autoDelete: false,
             arguments: null
@@ -40,13 +50,35 @@ public sealed class RabbitMqPaymentProducerService : IMessageProducerService<Pay
             durable: true,
             autoDelete: false,
             exclusive: false,
+            arguments: new Dictionary<string, object>
+            {
+                { "x-dead-letter-exchange", ExchangeRetryName }
+            }
+        );
+
+        _channel.QueueDeclare(
+            queue: QueueRetryName,
+            durable: true,
+            autoDelete: false,
+            exclusive: false,
+            arguments: new Dictionary<string, object>
+            {
+                { "x-message-ttl", 10_000 },
+                { "x-dead-letter-exchange", ExchangeName }
+            }
+        );
+
+        _channel.QueueBind(
+            exchange: QueueName,
+            queue: ExchangeName,
+            routingKey: "",
             arguments: null
         );
 
         _channel.QueueBind(
-            queue: QueueName,
-            exchange: ExchangeName,
-            routingKey: RouteName,
+            exchange: ExchangeRetryName,
+            queue: QueueRetryName,
+            routingKey: "",
             arguments: null
         );
     }
@@ -60,10 +92,10 @@ public sealed class RabbitMqPaymentProducerService : IMessageProducerService<Pay
         var serialized = JsonConvert.SerializeObject(data);
 
         var body = Encoding.UTF8.GetBytes(serialized);
-        
+
         _channel.BasicPublish(
-            exchange: ExchangeName,
-            routingKey: RouteName,
+            exchange: QueueName,
+            routingKey: "make-payment",
             basicProperties: properties,
             body: body
         );

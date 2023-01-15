@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Commons.Exceptions;
 using Newtonsoft.Json;
 using PaymentService.Delegates;
 using PaymentService.RabbitMq.Models;
@@ -14,7 +13,11 @@ public sealed class RabbitMqPaymentConsumerService : IMessageConsumerService<Pay
     private readonly IConnection _connection;
     private readonly IModel _channel;
 
-    private const string QueueName = "payments-queue";
+    private const string QueueName = "payments";
+    private const string ExchangeName = "payments";
+    
+    private const string QueueRetryName = "payments-retry";
+    private const string ExchangeRetryName = "payments-retry";
 
     public RabbitMqPaymentConsumerService()
     {
@@ -28,17 +31,62 @@ public sealed class RabbitMqPaymentConsumerService : IMessageConsumerService<Pay
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
 
+        _channel.ExchangeDeclare(
+            exchange: ExchangeName,
+            type: ExchangeType.Fanout,
+            durable: true,
+            autoDelete: false,
+            arguments: null
+        );
+
+        _channel.ExchangeDeclare(
+            exchange: ExchangeRetryName,
+            type: ExchangeType.Fanout,
+            durable: true,
+            autoDelete: false,
+            arguments: null
+        );
+
         _channel.QueueDeclare(
             queue: QueueName,
             durable: true,
             autoDelete: false,
             exclusive: false,
+            arguments: new Dictionary<string, object>
+            {
+                { "x-dead-letter-exchange", ExchangeRetryName }
+            }
+        );
+
+        _channel.QueueDeclare(
+            queue: QueueRetryName,
+            durable: true,
+            autoDelete: false,
+            exclusive: false,
+            arguments: new Dictionary<string, object>
+            {
+                { "x-message-ttl", 10_000 },
+                { "x-dead-letter-exchange", ExchangeName }
+            }
+        );
+
+        _channel.QueueBind(
+            exchange: QueueName,
+            queue: ExchangeName,
+            routingKey: "",
+            arguments: null
+        );
+
+        _channel.QueueBind(
+            exchange: ExchangeRetryName,
+            queue: QueueRetryName,
+            routingKey: "",
             arguments: null
         );
 
         _channel.BasicQos(
             prefetchSize: 0,
-            prefetchCount: 3,
+            prefetchCount: 1,
             global: false
         );
     }
@@ -68,19 +116,12 @@ public sealed class RabbitMqPaymentConsumerService : IMessageConsumerService<Pay
                     multiple: false
                 );
             }
-            catch (RejectException)
-            {
-                _channel.BasicReject(
-                    deliveryTag: ea.DeliveryTag,
-                    requeue: false
-                );
-            }
             catch
             {
                 _channel.BasicNack(
                     deliveryTag: ea.DeliveryTag,
                     multiple: false,
-                    requeue: true
+                    requeue: false
                 );
             }
         };
